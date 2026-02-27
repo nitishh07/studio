@@ -96,20 +96,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="container mx-auto px-4 -mt-16 relative z-20">
-        <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[2.5rem] p-12">
-          <p className="text-center text-sm font-bold text-muted-foreground uppercase tracking-[0.2em] mb-10">Trusted by Global Leaders</p>
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-             <div className="text-3xl font-black text-slate-800 tracking-tighter">Google</div>
-             <div className="text-3xl font-black text-slate-800 tracking-tighter">Amazon</div>
-             <div className="text-3xl font-black text-slate-800 tracking-tighter">Stripe</div>
-             <div className="text-3xl font-black text-slate-800 tracking-tighter">Netflix</div>
-             <div className="text-3xl font-black text-slate-800 tracking-tighter">Meta</div>
-          </div>
-        </div>
-      </section>
-
       {/* Stats Grid */}
       <section className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
