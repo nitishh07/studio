@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -19,7 +20,13 @@ export interface Job {
 }
 
 export default function JobCard({ job }: { job: Job }) {
-  const dateStr = job.postedAt?.toDate ? formatDistanceToNow(job.postedAt.toDate(), { addSuffix: true }) : "Recent";
+  const [dateStr, setDateStr] = useState<string>("Recent");
+
+  useEffect(() => {
+    if (job.postedAt?.toDate) {
+      setDateStr(formatDistanceToNow(job.postedAt.toDate(), { addSuffix: true }));
+    }
+  }, [job.postedAt]);
 
   return (
     <Card className="hover:shadow-md transition-all border-l-4 border-l-primary/20 hover:border-l-primary group">

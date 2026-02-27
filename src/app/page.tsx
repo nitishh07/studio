@@ -54,15 +54,15 @@ export default function HomePage() {
     return Array.from(new Set(jobs.map(j => j.location)));
   }, [jobs]);
 
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl || "";
-  const aboutImage = PlaceHolderImages.find(img => img.id === 'about-team')?.imageUrl || "";
+  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl || "https://picsum.photos/seed/office/1920/1080";
+  const aboutImage = PlaceHolderImages.find(img => img.id === 'about-team')?.imageUrl || "https://picsum.photos/seed/team/1000/1000";
 
   return (
     <div className="flex flex-col gap-16 md:gap-24 pb-20">
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         {/* Background Image with Overlay */}
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-10 bg-muted">
           <Image 
             src={heroImage} 
             alt="Hero Background" 
@@ -266,7 +266,7 @@ export default function HomePage() {
       {/* About Section */}
       <section id="about" className="container mx-auto px-4 scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="relative aspect-[4/3] lg:aspect-square rounded-[2rem] overflow-hidden shadow-2xl">
+          <div className="relative aspect-[4/3] lg:aspect-square rounded-[2rem] overflow-hidden shadow-2xl bg-muted">
             <Image 
               src={aboutImage} 
               alt="About SwiftJobs" 
@@ -274,7 +274,7 @@ export default function HomePage() {
               className="object-cover"
               data-ai-hint="team working"
             />
-            <div className="absolute bottom-8 left-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-primary/10">
+            <div className="absolute bottom-8 left-8 right-8 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-primary/10 z-20">
               <p className="italic font-medium text-primary text-lg">
                 "SwiftJobs reduced our hiring time by 40% in just three months."
               </p>

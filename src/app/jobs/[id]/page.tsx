@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, use } from "react";
+import { useMemo, use, useState, useEffect } from "react";
 import { doc } from "firebase/firestore";
 import { useFirestore, useDoc } from "@/firebase";
 import { Job } from "@/components/JobCard";
@@ -23,6 +23,7 @@ import { formatDistanceToNow } from "date-fns";
 export default function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const firestore = useFirestore();
+  const [dateStr, setDateStr] = useState<string>("Recent");
   
   const jobRef = useMemo(() => {
     if (!firestore || !resolvedParams.id) return null;
@@ -30,6 +31,12 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
   }, [firestore, resolvedParams.id]);
 
   const { data: job, loading } = useDoc<Job>(jobRef);
+
+  useEffect(() => {
+    if (job?.postedAt?.toDate) {
+      setDateStr(formatDistanceToNow(job.postedAt.toDate(), { addSuffix: true }));
+    }
+  }, [job?.postedAt]);
 
   if (loading) {
     return (
@@ -61,8 +68,6 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
       </div>
     );
   }
-
-  const dateStr = job.postedAt?.toDate ? formatDistanceToNow(job.postedAt.toDate(), { addSuffix: true }) : "Recent";
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

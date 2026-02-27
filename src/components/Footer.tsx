@@ -1,8 +1,17 @@
 
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BriefcaseBusiness, Twitter, Github, Linkedin, Mail } from "lucide-react";
 
 export default function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="w-full border-t bg-white mt-auto">
       <div className="container mx-auto px-4 py-12">
@@ -58,7 +67,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} SwiftJobs Platform. All rights reserved.</p>
+          <p>© {year || "..."} SwiftJobs Platform. All rights reserved.</p>
           <p>Built with efficiency and speed for the next generation of workers.</p>
         </div>
       </div>
