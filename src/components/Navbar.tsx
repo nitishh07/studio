@@ -2,17 +2,20 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/lib/contexts/auth-context";
+import { useAuth, useUser } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { BriefcaseBusiness, UserCircle, LogOut, LayoutDashboard } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user } = useUser();
+  const auth = useAuth();
   const router = useRouter();
 
   const handleLogout = async () => {
-    await logout();
+    if (!auth) return;
+    await signOut(auth);
     router.push("/");
   };
 

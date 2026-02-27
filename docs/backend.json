@@ -1,0 +1,66 @@
+
+{
+  "entities": {
+    "Job": {
+      "title": "Job Posting",
+      "description": "A job opening listing on the board.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the job position."
+        },
+        "company": {
+          "type": "string",
+          "description": "The name of the company hiring."
+        },
+        "location": {
+          "type": "string",
+          "description": "The geographical or remote location of the job."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Full-time",
+            "Internship",
+            "Contract"
+          ],
+          "description": "The employment type."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed job description and requirements."
+        },
+        "applyLink": {
+          "type": "string",
+          "format": "uri",
+          "description": "The external URL for candidates to apply."
+        },
+        "postedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of when the job was posted."
+        }
+      },
+      "required": [
+        "title",
+        "company",
+        "location",
+        "type",
+        "description",
+        "applyLink"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "/jobs/{jobId}": {
+      "schema": "Job",
+      "description": "Collection of all public job postings."
+    }
+  }
+}

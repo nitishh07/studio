@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useState, useMemo } from "react";
+import { collection, query, orderBy } from "firebase/firestore";
+import { useFirestore, useCollection } from "@/firebase";
 import JobCard, { Job } from "@/components/JobCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,29 +11,20 @@ import { Search, SlidersHorizontal, Briefcase, MapPin } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HomePage() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  
+  const firestore = useFirestore();
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
 
-  useEffect(() => {
-    const q = query(collection(db, "jobs"), orderBy("postedAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const jobsData: Job[] = [];
-      snapshot.forEach((doc) => {
-        jobsData.push({ id: doc.id, ...doc.data() } as Job);
-      });
-      setJobs(jobsData);
-      setLoading(false);
-    });
+  const jobsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, "jobs"), orderBy("postedAt", "desc"));
+  }, [firestore]);
 
-    return () => unsubscribe();
-  }, []);
+  const { data: jobs, loading } = useCollection<Job>(jobsQuery);
 
-  useEffect(() => {
+  const filteredJobs = useMemo(() => {
+    if (!jobs) return [];
     let result = jobs;
 
     if (searchTerm) {
@@ -53,10 +44,13 @@ export default function HomePage() {
       result = result.filter(j => j.location === locationFilter);
     }
 
-    setFilteredJobs(result);
+    return result;
   }, [searchTerm, typeFilter, locationFilter, jobs]);
 
-  const uniqueLocations = Array.from(new Set(jobs.map(j => j.location)));
+  const uniqueLocations = useMemo(() => {
+    if (!jobs) return [];
+    return Array.from(new Set(jobs.map(j => j.location)));
+  }, [jobs]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -127,9 +121,11 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold font-headline flex items-center gap-2">
             Latest Opportunities
-            <span className="text-sm font-normal bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-              {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
-            </span>
+            {!loading && (
+              <span className="text-sm font-normal bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                {filteredJobs.length} {filteredJobs.length === 1 ? 'job' : 'jobs'} found
+              </span>
+            )}
           </h2>
         </div>
 

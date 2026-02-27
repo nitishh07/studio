@@ -1,11 +1,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { collection, query, orderBy, onSnapshot, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { useAuth } from "@/lib/contexts/auth-context";
+import { collection, query, orderBy, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { useFirestore, useCollection, useUser } from "@/firebase";
 import { Job } from "@/components/JobCard";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -26,61 +25,54 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function AdminDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | undefined>(undefined);
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/admin/login");
-    }
-  }, [user, authLoading, router]);
+  const jobsQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return query(collection(firestore, "jobs"), orderBy("postedAt", "desc"));
+  }, [firestore, user]);
 
-  useEffect(() => {
-    if (!user) return;
+  const { data: jobs, loading: jobsLoading } = useCollection<Job>(jobsQuery);
 
-    const q = query(collection(db, "jobs"), orderBy("postedAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const jobsData: Job[] = [];
-      snapshot.forEach((doc) => {
-        jobsData.push({ id: doc.id, ...doc.data() } as Job);
-      });
-      setJobs(jobsData);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  const filteredJobs = jobs.filter(j => 
-    j.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    j.company.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredJobs = useMemo(() => {
+    if (!jobs) return [];
+    return jobs.filter(j => 
+      j.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      j.company.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [jobs, searchTerm]);
 
   const handleSaveJob = async (jobData: Partial<Job>) => {
-    if (editingJob) {
-      await updateDoc(doc(db, "jobs", editingJob.id), jobData);
-    } else {
-      await addDoc(collection(db, "jobs"), {
-        ...jobData,
-        postedAt: serverTimestamp(),
-      });
+    if (!firestore) return;
+    try {
+      if (editingJob) {
+        updateDoc(doc(firestore, "jobs", editingJob.id), jobData);
+      } else {
+        addDoc(collection(firestore, "jobs"), {
+          ...jobData,
+          postedAt: serverTimestamp(),
+        });
+      }
+      setShowForm(false);
+      setEditingJob(undefined);
+      toast({ title: "Success", description: "Job saved successfully." });
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
     }
-    setShowForm(false);
-    setEditingJob(undefined);
   };
 
   const handleDeleteJob = async () => {
-    if (deletingJobId) {
+    if (deletingJobId && firestore) {
       try {
-        await deleteDoc(doc(db, "jobs", deletingJobId));
+        deleteDoc(doc(firestore, "jobs", deletingJobId));
         toast({ title: "Deleted", description: "Job posting removed successfully." });
       } catch (error) {
         toast({ title: "Error", description: "Failed to delete job.", variant: "destructive" });
@@ -90,7 +82,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (authLoading || (loading && !showForm)) {
+  if (authLoading) {
     return (
       <div className="h-[70vh] flex items-center justify-center">
         <Loader2 className="h-10 w-10 text-primary animate-spin" />
@@ -98,7 +90,10 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    router.push("/admin/login");
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -151,7 +146,13 @@ export default function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredJobs.length > 0 ? (
+                {jobsLoading ? (
+                   <TableRow>
+                     <TableCell colSpan={5} className="text-center py-12">
+                       <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                     </TableCell>
+                   </TableRow>
+                ) : filteredJobs.length > 0 ? (
                   filteredJobs.map((job) => (
                     <TableRow key={job.id} className="hover:bg-primary/5 transition-colors">
                       <TableCell className="font-semibold">{job.title}</TableCell>

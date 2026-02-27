@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useEffect, useState, use } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useMemo, use } from "react";
+import { doc } from "firebase/firestore";
+import { useFirestore, useDoc } from "@/firebase";
 import { Job } from "@/components/JobCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,25 +22,14 @@ import { formatDistanceToNow } from "date-fns";
 
 export default function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [job, setJob] = useState<Job | null>(null);
-  const [loading, setLoading] = useState(true);
+  const firestore = useFirestore();
+  
+  const jobRef = useMemo(() => {
+    if (!firestore || !resolvedParams.id) return null;
+    return doc(firestore, "jobs", resolvedParams.id);
+  }, [firestore, resolvedParams.id]);
 
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const docRef = doc(db, "jobs", resolvedParams.id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setJob({ id: docSnap.id, ...docSnap.data() } as Job);
-        }
-      } catch (error) {
-        console.error("Error fetching job details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchJob();
-  }, [resolvedParams.id]);
+  const { data: job, loading } = useDoc<Job>(jobRef);
 
   if (loading) {
     return (
