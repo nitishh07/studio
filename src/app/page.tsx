@@ -6,7 +6,7 @@ import { useFirestore, useCollection } from "@/firebase";
 import JobCard, { Job } from "@/components/JobCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Briefcase, MapPin, CheckCircle, Users, Globe, Zap, ArrowRight, Star, Quote } from "lucide-react";
+import { Search, SlidersHorizontal, Briefcase, MapPin, CheckCircle, Users, Globe, Zap, ArrowRight, Star, Quote, Code2, Heart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -56,7 +56,6 @@ export default function HomePage() {
   }, [jobs]);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl || "https://picsum.photos/seed/office/1920/1080";
-  const aboutImage = PlaceHolderImages.find(img => img.id === 'about-team')?.imageUrl || "https://picsum.photos/seed/team/1000/1000";
 
   return (
     <div className="flex flex-col gap-16 md:gap-24 pb-20 overflow-x-hidden">
@@ -91,7 +90,7 @@ export default function HomePage() {
               Find My Next Role
             </a>
             <a href="#about" className="px-10 py-5 bg-white/80 backdrop-blur-sm border border-primary/10 text-primary font-bold rounded-2xl hover:bg-white transition-all text-lg shadow-sm">
-              Our Mission
+              Meet the Team
             </a>
           </div>
         </div>
@@ -139,10 +138,6 @@ export default function HomePage() {
             <Badge variant="outline" className="mb-4 text-primary border-primary/20 px-3 py-1 font-bold">LATEST OPPORTUNITIES</Badge>
             <h2 className="text-4xl md:text-5xl font-black font-headline tracking-tight">Discover Your Potential</h2>
             <p className="text-muted-foreground text-xl mt-2">The most innovative companies are waiting for you.</p>
-          </div>
-          <div className="flex items-center gap-2 text-primary font-bold hover:underline cursor-pointer group text-lg">
-            See all roles
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
 
@@ -261,33 +256,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section - Code & Karma Team */}
       <section id="about" className="container mx-auto px-4 scroll-mt-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="relative rounded-[3rem] overflow-hidden shadow-2xl group">
-            <Image 
-              src={aboutImage} 
-              alt="Our Team" 
-              width={800}
-              height={800}
-              className="object-cover hover:scale-105 transition-transform duration-700"
-              data-ai-hint="team working"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
+          <div className="relative p-12 bg-white rounded-[3rem] border-2 border-primary/5 shadow-2xl overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-6">
+              <div className="bg-primary/10 p-6 rounded-[2rem] text-primary rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                <Code2 className="h-16 w-16" />
+              </div>
+              <h3 className="text-4xl font-black tracking-tighter text-slate-900">Code & Karma</h3>
+              <p className="text-lg text-muted-foreground font-medium italic max-w-xs mx-auto">
+                "Turning vision into reality, one commit at a time."
+              </p>
+              <div className="pt-6 w-full space-y-4">
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-primary/40">The Creators</p>
+                <div className="grid grid-cols-1 gap-3">
+                  {["Nitish Kumar Pandit", "Shubham Kumar Singh", "Kushagra Mohan", "Rohan Deb"].map((name) => (
+                    <div key={name} className="bg-muted/30 py-3 px-6 rounded-2xl text-lg font-bold text-slate-800 hover:bg-primary/5 transition-colors">
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 text-primary items-center pt-4 font-bold">
+                Built with <Heart className="h-4 w-4 fill-primary" /> for the community
+              </div>
+            </div>
           </div>
           <div className="space-y-8">
             <Badge className="bg-accent text-accent-foreground px-4 py-1.5 font-black uppercase tracking-widest">Our Story</Badge>
             <h2 className="text-5xl md:text-6xl font-black font-headline tracking-tighter leading-tight">
-              Reinventing the <span className="text-primary italic">Hiring Standard</span>
+              Driven by <span className="text-primary italic">Code & Karma</span>
             </h2>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              We started SwiftJobs because we were tired of generic, ad-filled job boards. We believe finding a job should be as exciting as getting one.
+              We started SwiftJobs because we were tired of generic, ad-filled job boards. We believe finding a job should be as exciting as getting one. Our mission is to provide the cleanest, fastest recruitment platform on the web.
             </p>
             <div className="space-y-8">
               {[
                 { title: "No Noise, Just Results", desc: "We vet every listing and every employer to ensure high-quality standards." },
                 { title: "AI-Powered Clarity", desc: "Our engine helps employers write descriptions that actually make sense." },
-                { title: "Fast-Track Applications", desc: "Connect directly to hiring managers through our streamlined portal." }
+                { title: "Direct Connections", desc: "Built with transparency to connect global talent with top-tier opportunities." }
               ].map((item, idx) => (
                 <div key={idx} className="flex gap-6 group">
                   <div className="mt-1 bg-primary/10 text-primary p-3 rounded-2xl group-hover:bg-primary group-hover:text-white transition-colors duration-300">
